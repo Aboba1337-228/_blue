@@ -3,7 +3,7 @@ const cors = require("cors")
 const userRouter = require("./routers/userRouter")
 
 const PORT = process.env.PORT || 3001
-const HOST = 'localhost' //192.168.100.60
+const HOST = '192.168.100.60' //192.168.100.60
 const app = express()
 
 app.use(express.json())

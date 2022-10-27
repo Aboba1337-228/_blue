@@ -1,8 +1,8 @@
 const settingsBackEnd = {
     hostDB: 'localhost',
     userDB: 'root',
-    passwordDB: '',
-    DB: 'quiz2',
+    passwordDB: 'root',
+    DB: 'sdo2',
 }
 
 module.exports = settingsBackEnd

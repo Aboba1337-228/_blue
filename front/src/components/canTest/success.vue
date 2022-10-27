@@ -1,11 +1,7 @@
 <template>
     <div class="container">
         <h2>Тест пройден</h2>
-        <form>
-            <input type="text" placeholder="ФИО">
-            <input type="text" placeholder="E-mail">
-            <button>Отправить</button>
-        </form>
+        <h3>Баллы: {{isPrecentBalls}}</h3>
     </div>
 </template>
 
@@ -64,6 +60,13 @@ form > button {
 
 <script>
 export default {
+
+    data() {
+        return {
+            isPrecentBalls: 0
+        }
+    },
+
     mounted() {
         window.scrollTo({ top: 0 });
     }

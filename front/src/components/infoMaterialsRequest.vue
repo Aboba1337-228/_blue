@@ -4,12 +4,12 @@
         <div v-if="isSuccess == true">
             <div v-if="isList == 0">
                 <div v-if="isMaterialActive == 0">
-                    <div class="breadcrumb"><router-link class="nav__breadcrumb" to="/">Главная</router-link> / Материалы</div>
+                    <div class="breadcrumb"><router-link class="nav__breadcrumb" to="/">Главная</router-link> / Предметы</div>
                     <hr class="breadcrumb__line">
                 </div>
                 <div v-if="isMaterialActive == 0" class="test__inner">
                     <div class="test__menu">
-                    <h1>ВЫБОР МАТЕРИАЛА</h1>
+                    <h1>ВЫБОР ПРЕДМЕТА</h1>
                         <div  class="link__inner">
                             <div v-for="itemFullMaterials in isFullMaterials" :key="itemFullMaterials">
                                 <div class="test__link" @click="isMaterialActive = itemFullMaterials.test_id" >
@@ -25,12 +25,12 @@
                     <div v-if="isMaterialActive == itemsFullMaterials.test_id">
                         <div class="breadcrumb">
                             <router-link class="nav__breadcrumb" to="/">Главная</router-link>
-                             / <router-link class="nav__breadcrumb" to="/materials" @click="isMaterialActive = 0">Материалы</router-link>
+                             / <router-link class="nav__breadcrumb" to="/materials" @click="isMaterialActive = 0">Предмет</router-link>
                              / №{{itemsFullMaterials.test_id}}</div>
                         <hr class="breadcrumb__line">
                     </div>
                     <div class="materials__inner">
-                        <div v-if="isMaterialActive == itemsFullMaterials.test_id">
+                        <!-- <div v-if="isMaterialActive == itemsFullMaterials.test_id">
                             <h2 @click="isTraining = !isTraining">Программа обучения</h2>
                             <a v-if="isTraining == true" href="/pdf/Resume.pdf">
                                 <img src="../assets/materials/obl_tipovaya_uik.jpg" class="materials__pdf" width="150" height="200" alt="">
@@ -40,7 +40,7 @@
                             <div v-if="isMethodical == true" class="materials">{{ itemsFullMaterials.materials }}</div>
 
                             <h2><a href="/pdf/Инструкция.pdf">Инструкция</a></h2>
-                        </div>
+                        </div> -->
                         <button class="test__ready" v-if="isMaterialActive == itemsFullMaterials.test_id" @click="isList = itemsFullMaterials.test_id, isReadyTest(), isReadyAnswer()">Начать тест</button>
                     </div>
                 </div>
@@ -63,7 +63,21 @@
                 </div>
             </div>
 
-            <Success v-if="isList == 'SuccessTest'" />
+            <div v-if="isList == 'SuccessTest'" class="container">
+                <h2>Тест пройден</h2>
+                <h3>Баллы: {{isPrecentBalls}}</h3>
+                 <Bar style="width: 300px; height: 300px;"
+                    :chart-options="chartOptions"
+                    :chart-data="chartData"
+                    :chart-id="chartId"
+                    :dataset-id-key="datasetIdKey"
+                    :plugins="plugins"
+                    :css-classes="cssClasses"
+                    :styles="styles"
+                    :width="5"
+                    :height="5"
+                />
+            </div>
             <Error v-if="isList == 'FalseTest'" />
         </div>
     </div>
@@ -74,12 +88,48 @@ import axios from 'axios'
 import settings from '../settings'
 import Success from './canTest/success.vue'
 import Error from './canTest/error.vue'
+import { Bar } from 'vue-chartjs'
+import { Chart as ChartJS, Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale } from 'chart.js'
+
+ChartJS.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale)
 
 export default {
     components: {
         Success,
-        Error
+        Error,
+        Bar
     },
+    props: {
+        chartId: {
+        type: String,
+        default: 'bar-chart'
+        },
+        datasetIdKey: {
+        type: String,
+        default: 'label'
+        },
+        width: {
+        type: Number,
+        default: 100
+        },
+        height: {
+        type: Number,
+        default: 100
+        },
+        cssClasses: {
+        default: '',
+        type: String
+        },
+        styles: {
+        type: Object,
+        default: () => {},
+        },
+        plugins: {
+        type: Object,
+        default: () => {}
+        }
+    },
+
     data() {
         return {
             isMaterialsFalse: "",
@@ -97,6 +147,19 @@ export default {
             //Materials
             isTraining: false,
             isMethodical: false,
+            isPrecentBalls: 0,
+
+            chartData: {
+                labels: [ 'Баллы', 'Проценты' ],
+                datasets: [ { 
+                    label: 'balls',
+                    data: [0,0],
+                    backgroundColor: ['lightblue','rgb(255, 99, 132)'],
+                } ]
+            },
+            chartOptions: {
+                responsive: true
+            }
         }
     },
 
@@ -158,7 +221,7 @@ export default {
         isFinishTest() {
             let next = 0
             for (let indexAnswer = 0; indexAnswer < this.isVerifyAnswer.length; indexAnswer++) {
-                if(this.isVerifySelectAnswer[indexAnswer] == this.isVerifyAnswer[0]) {
+                if(this.isVerifySelectAnswer[indexAnswer] == this.isVerifyAnswer[indexAnswer]) {
                     next += 1
                 } else {
                     this.isList = "FalseTest"
@@ -166,7 +229,10 @@ export default {
             }
 
             let percent = this.isVerifyAnswer.length * 0.5
-            if (percent <= next) {
+            if (percent < next) {
+                this.chartData.datasets[0]['data'][0] = next 
+                this.chartData.datasets[0]['data'][1] = next * 0.5
+                this.isPrecentBalls = next
                 this.isList = "SuccessTest"
             }
         }
@@ -352,6 +418,57 @@ export default {
     border: 2px solid rgb(72, 251, 76);
     box-shadow: rgb(72, 251, 76) 0px 4px 0px;
     font-size: 14px;
+}
+
+h2 {
+    text-align: center;
+    color: lightgreen;
+}
+
+.verify { 
+    display: grid;
+    justify-content: center;
+    margin: 25px 0px;
+}
+
+.verify > a > button {
+    width: 80px;
+    height: 30px;
+    margin: 10px 0px;
+}
+
+.verify > a {
+    text-decoration: none;
+    color: #000;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    max-width: 350px;
+    margin: 50px auto;
+}
+
+form > input {
+    margin: 5px 0px;
+    height: 30px;
+    font-size: 20px;
+    padding-left: 5px;
+}
+
+form > button {
+    height: 35px;
+    font-weight: 500;
+    background: rgb(28, 176, 246);
+    border-radius: 7px;
+    border: none;
+    color: rgb(255, 255, 255);
+    box-shadow: rgb(34 155 213) 0px 4px 0px;
+    padding: 6px 20px;
+    font-size: 20px;
+    transition: all 0.3s ease-in-out 0s;
+    cursor: pointer;
+    box-sizing: border-box;
 }
 
 </style>
