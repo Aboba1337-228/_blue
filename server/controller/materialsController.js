@@ -11,6 +11,21 @@ class materials {
         }
     }
 
+    async podMaterials(req, res) {
+        try {
+            const { test_id } = req.body
+            const connect = await connection
+            const [rows, fields] = await connect.execute('SELECT * FROM `pod_materials` WHERE `test_id` = ?', [test_id])  
+            
+            if(rows[0]) {
+                return res.status(200).json({ message: rows })
+            }
+            return res.status(200).json({ message: "Под материалов нет" })
+        } catch (error) {
+            return res.status(400).json({ message: error.message })
+        }
+    }
+
     async testQuest(req, res) {
         try {
             const { test_id } = req.body

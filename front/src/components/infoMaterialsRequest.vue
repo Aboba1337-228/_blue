@@ -3,60 +3,52 @@
     <div class="main__materials" v-if="Access()">
         <div v-if="isSuccess == true">
             <div v-if="isList == 0">
-                <div v-if="isMaterialActive == 0">
+                <div v-if="isPodActive == 0">
                     <div class="breadcrumb"><router-link class="nav__breadcrumb" to="/">Главная</router-link> / Предметы</div>
                     <hr class="breadcrumb__line">
                 </div>
-                <div v-if="isMaterialActive == 0" class="test__inner">
+                <div v-if="isPodActive == 0" class="test__inner">
                     <div class="test__menu">
                     <h1>ВЫБОР ПРЕДМЕТА</h1>
-                        <div  class="link__inner">
+                        <div class="link__inner">
                             <div v-for="itemFullMaterials in isFullMaterials" :key="itemFullMaterials">
-                                <div class="test__link" @click="isMaterialActive = itemFullMaterials.test_id" >
+                                <div class="test__link" @click="isReadyPodMaterials(), isPodActive = itemFullMaterials.test_id" >
                                     {{ itemFullMaterials.name_materials }}
                                 </div>
                             </div>
                         </div>
                     </div>
-                <!-- <img src="../assets/test/main.png" alt=""> -->
                 </div>
 
-                <div class="materials__full" v-for="itemsFullMaterials in isFullMaterials" :key="itemsFullMaterials">
-                    <div v-if="isMaterialActive == itemsFullMaterials.test_id">
-                        <div class="breadcrumb">
-                            <router-link class="nav__breadcrumb" to="/">Главная</router-link>
-                             / <router-link class="nav__breadcrumb" to="/materials" @click="isMaterialActive = 0">Предмет</router-link>
-                             / №{{itemsFullMaterials.test_id}}</div>
-                        <hr class="breadcrumb__line">
-                    </div>
+                <div class="test__menu">
+                    <div class="link__inner" v-for="itemPodMaterials in isPodMaterials.length" :key="itemPodMaterials">
+                        <div v-if="isPodActive == isPodMaterials[0].test_id">
+                            <div class="test__link" @click="isMaterialActive = isPodMaterials[itemPodMaterials - 1].topic_id, isPodActive = -1">
+                                {{isPodMaterials[itemPodMaterials - 1].topic}}
+                            </div>
+                        </div>
+                    </div>   
+                </div>
+
+                <div class="materials__full" v-for="itemPodMaterials in isPodMaterials" :key="itemPodMaterials">
                     <div class="materials__inner">
-                        <!-- <div v-if="isMaterialActive == itemsFullMaterials.test_id">
-                            <h2 @click="isTraining = !isTraining">Программа обучения</h2>
-                            <a v-if="isTraining == true" href="/pdf/Resume.pdf">
-                                <img src="../assets/materials/obl_tipovaya_uik.jpg" class="materials__pdf" width="150" height="200" alt="">
-                            </a>
-
-                            <h2 @click="isMethodical = !isMethodical">Учебно-методические материалы</h2>
-                            <div v-if="isMethodical == true" class="materials">{{ itemsFullMaterials.materials }}</div>
-
-                            <h2><a href="/pdf/Инструкция.pdf">Инструкция</a></h2>
-                        </div> -->
-                        <button class="test__ready" v-if="isMaterialActive == itemsFullMaterials.test_id" @click="isList = itemsFullMaterials.test_id, isReadyTest(), isReadyAnswer()">Начать тест</button>
+                        <button class="test__ready" v-if="isMaterialActive == itemPodMaterials.topic_id" @click="isList = itemPodMaterials.topic_id, isReadyTest(), isReadyAnswer()">Начать тест</button>
                     </div>
                 </div>
             </div>
 
-            <div v-for="isFullTest in isFullMaterials" :key="isFullTest" >
-                <div class="test__sep" v-if="isList == isFullTest.test_id">
+            <div v-for="itemPodMaterials in isPodMaterials" :key="itemPodMaterials" >
+                <div class="test__sep" v-if="isList == itemPodMaterials.topic_id">
                     <h1 class="test__name">Тест</h1>
                     <div v-for="itemQuest in isTestQuest.length" :key="itemQuest">
-                        <h3 class="quest__test">Вопрос {{ itemQuest }}:  <span>{{ isTestQuest[itemQuest - 1] }}</span></h3>
+                        <h3 class="quest__test"><div>{{ itemQuest }}: <span>{{ isTestQuestText[itemQuest - 1] }}</span></div> <img :src="isTestQuest[itemQuest - 1]" alt="">  <!--<span>{{ isTestQuest[itemQuest - 1] }}</span>--></h3>
                         <div class="test__quest">
-                            <select v-model="isVerifySelectAnswer[itemQuest - 1]">
+                            <!-- <select v-model="isVerifySelectAnswer[itemQuest - 1]">
                                 <option :value="itemAnswer" v-for="itemAnswer in isAnswer[itemQuest - 1]" :key="itemAnswer">
                                     {{ itemAnswer }}
                                 </option>
-                            </select>
+                            </select> -->
+                            <input v-model="isVerifySelectAnswer[itemQuest - 1]" type="text" placeholder="Введите ответ">
                         </div>
                     </div>
                     <button @click="isFinishTest" class="test__finish">Завершить тест</button>
@@ -66,7 +58,23 @@
             <div v-if="isList == 'SuccessTest'" class="container">
                 <h2>Тест пройден</h2>
                 <h3>Баллы: {{isPrecentBalls}}</h3>
-                 <Bar style="width: 300px; height: 300px;"
+                <h4>1 - Правильно</h4>
+                <h4>0 - Неправильно</h4>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Число вопросов</th>
+                            <th v-for="index in isNextR.length" :key="index">{{ index }}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Ответы</td>
+                            <td v-for="index1 in isNextR.length" :key="index1" :class="isNextR[index1 - 1] === 1 ? 'primary' : 'accent' && isNextR[index1 - 1] === 0 ? 'primaryRed' : 'accent2'">{{isNextR[index1 - 1]}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+                 <!-- <Bar style="width: 300px; height: 300px;"
                     :chart-options="chartOptions"
                     :chart-data="chartData"
                     :chart-id="chartId"
@@ -76,9 +84,30 @@
                     :styles="styles"
                     :width="5"
                     :height="5"
-                />
+                /> -->
             </div>
-            <Error v-if="isList == 'FalseTest'" />
+            <div v-if="isList == 'FalseTest'">
+                <div>
+                    <h2 class="h22">Тест не пройден</h2>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Число вопросов</th>
+                                <th v-for="index3 in isNextR.length" :key="index3">{{ index3 }}</th>
+                                {{}}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Ответы</td>
+                                <td v-for="index1 in isNextR.length" :key="index1" :class="isNextR[index1 - 1] === 1 ? 'primary' : 'accent' && isNextR[index1 - 1] === 0 ? 'primaryRed' : 'accent2'">{{isNextR[index1 - 1]}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <button class="button2" @click="reloadURL()" to="/materials">Назад</button>
+                </div>
+            </div>
+
         </div>
     </div>
 </template>
@@ -135,15 +164,18 @@ export default {
             isMaterialsFalse: "",
             isTestFalse: "",
             isFullMaterials: [],
+            isPodMaterials: [],
             isTestQuest: [],
+            isTestQuestText: [],
             isAnswer: [],
             isMaterialActive: 0,
+            isPodActive: 0,
             isTestActive: 0,
             isSuccess: false,
             isList: "",
             isVerifyAnswer: [],
             isVerifySelectAnswer: [],
-
+            isNextR: [],
             //Materials
             isTraining: false,
             isMethodical: false,
@@ -195,11 +227,24 @@ export default {
             }
         },
 
+        isReadyPodMaterials() {
+            try {
+                axios.post(`http://${settings.host}:${settings.port}/user/podMaterials`, {
+                    test_id: 1
+                }).then(response => {
+                    this.isPodMaterials = response.data.message
+                })
+            } catch (error) {
+                this.isMaterialsFalse = "Под материалы не загруженны!"
+            } 
+        },
+
         isReadyTest() {
             axios.post(`http://${settings.host}:${settings.port}/user/testQuest`, {
                 test_id: this.isList
             }).then(response => {
                 this.isTestQuest = JSON.parse(response.data.message.quest)
+                this.isTestQuestText = JSON.parse(response.data.message.quest_text)
             }).catch(error => {
                 this.isTestFalse = "Теста нет!"
             })
@@ -220,27 +265,95 @@ export default {
 
         isFinishTest() {
             let next = 0
+            let nextR = []
             for (let indexAnswer = 0; indexAnswer < this.isVerifyAnswer.length; indexAnswer++) {
-                if(this.isVerifySelectAnswer[indexAnswer] == this.isVerifyAnswer[indexAnswer]) {
+                if(this.isVerifySelectAnswer[indexAnswer] == this.isVerifyAnswer[indexAnswer]) { //[indexAnswer]
                     next += 1
+                    nextR.push(1)
                 } else {
-                    this.isList = "FalseTest"
+                    nextR.push(0)
                 }
             }
-
+            console.log(this.isVerifyAnswer)
             let percent = this.isVerifyAnswer.length * 0.5
             if (percent < next) {
                 this.chartData.datasets[0]['data'][0] = next 
                 this.chartData.datasets[0]['data'][1] = next * 0.5
                 this.isPrecentBalls = next
                 this.isList = "SuccessTest"
+                this.isNextR = nextR
+
+                axios.post(`http://${settings.host}:${settings.port}/user/loading`, {
+                    name: localStorage.getItem("name"),
+                    number: nextR
+                }).then(response => {
+                    console.log("Success")
+                })
+
+                console.log(nextR)
+            } else {
+                axios.post(`http://${settings.host}:${settings.port}/user/loading`, {
+                    name: localStorage.getItem("name"),
+                    number: nextR
+                }).then(response => {
+                    console.log("False")
+                })
+                this.isNextR = nextR
+                this.isList = "FalseTest"
             }
+        },
+        reloadURL() {
+            location.reload()
         }
     }
 }
 </script>
 
 <style scoped>
+/* table */
+
+table {
+    margin: 15px 0px;
+}
+
+th, td {
+    border: 1px solid #000;
+}
+
+td {
+    padding: 0px 5px;
+}
+
+.primary {
+    background: lightgreen;
+}
+
+.primaryRed {
+    background: lightcoral;
+}
+.h22 {
+    text-align: center;
+    color: red;
+}
+
+.button2 {
+    width: 165px;
+    height: 59px;
+    font-weight: 500;
+    background: rgb(28, 176, 246);
+    border-radius: 7px;
+    border: none;
+    color: rgb(255, 255, 255);
+    box-shadow: rgb(34 155 213) 0px 4px 0px;
+    padding: 6px 20px;
+    font-size: 20px;
+    transition: all 0.3s ease-in-out 0s;
+    cursor: pointer;
+    box-sizing: border-box;
+    text-decoration: none;
+}
+/* end table */
+
 .main__materials {
     margin: 20px 0px;
 }
@@ -281,7 +394,7 @@ export default {
   display: grid;
   align-items: flex-start;
   flex-wrap: wrap;
-  margin: 55px 0px;
+  margin: 5px 0px;
 }
 
 .link__inner > div > div {
@@ -381,8 +494,14 @@ export default {
     text-align: center;
 }
 
-.quest__test > span {
+.quest__test {
+    display: flex;
+    align-items: flex-start;
+}
+
+.quest__test > div {
     font-weight: 300;
+    margin-right: 10px;
 }
 
 .test__quest {
@@ -391,7 +510,7 @@ export default {
     margin: 22px 0px;
 }
 
-.test__quest:after {
+/* .test__quest:after {
     content: "▼";
     padding: 0 8px;
     font-size: 12px;
@@ -404,9 +523,9 @@ export default {
     height: 100%;
     pointer-events: none;
     box-sizing: border-box;
-}
+} */
 
-.test__quest > select {
+.test__quest > input {
     width: 365px;
     padding-right: 25px;
     -webkit-appearance: none;

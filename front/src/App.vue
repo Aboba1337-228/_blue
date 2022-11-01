@@ -55,6 +55,7 @@ export default {
                   url: `http://${settings.host}:${settings.port}/user/infoByToken`,
                   headers: {'Authorization': token}
               })
+              localStorage.setItem("name", infoUser.data.user.name)
               this.username = infoUser.data.user.name
               this._success = true
           } catch (error) {
