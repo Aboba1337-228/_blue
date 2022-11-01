@@ -142,7 +142,7 @@ export default {
             try {
                 const resultTest = await axios({
                     method: 'post',
-                    url: `http://${settings.host}:${settings.port}/user/unloading`,
+                    url: `http://${settings.host}/user/unloading`,
                 })
                 for (let index = 0; index < resultTest.data.message.length; index++) {
                     this.isResult.push([resultTest.data.message[index].id, resultTest.data.message[index].FIO, JSON.parse(resultTest.data.message[index].number)])                   

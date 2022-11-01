@@ -45,7 +45,7 @@ export default {
         try {
             const resultNews = await axios({
                 method: 'post',
-                url: `http://${settings.host}:${settings.port}/user/news`,
+                url: `http://${settings.host}/user/news`,
             })
             let result = resultNews.data.message
             let quiz = []

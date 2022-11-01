@@ -199,7 +199,7 @@ export default {
         try {
             const resultMaterials = await axios({
                 method: 'post',
-                url: `http://${settings.host}:${settings.port}/user/materials`,
+                url: `http://${settings.host}/user/materials`,
             })
             this.isFullMaterials = resultMaterials.data.message
         } catch (error) {
@@ -214,7 +214,7 @@ export default {
                 try {
                     axios({
                         method: 'post',
-                        url: `http://${settings.host}:${settings.port}/user/loginByToken`,
+                        url: `http://${settings.host}/user/loginByToken`,
                         headers: {'Authorization': token}
                     })
                     this.isSuccess = true
@@ -229,7 +229,7 @@ export default {
 
         isReadyPodMaterials() {
             try {
-                axios.post(`http://${settings.host}:${settings.port}/user/podMaterials`, {
+                axios.post(`http://${settings.host}/user/podMaterials`, {
                     test_id: 1
                 }).then(response => {
                     this.isPodMaterials = response.data.message
@@ -240,7 +240,7 @@ export default {
         },
 
         isReadyTest() {
-            axios.post(`http://${settings.host}:${settings.port}/user/testQuest`, {
+            axios.post(`http://${settings.host}/user/testQuest`, {
                 test_id: this.isList
             }).then(response => {
                 this.isTestQuest = JSON.parse(response.data.message.quest)
@@ -251,7 +251,7 @@ export default {
         },
 
         isReadyAnswer() {
-            axios.post(`http://${settings.host}:${settings.port}/user/testAnswer`, {
+            axios.post(`http://${settings.host}/user/testAnswer`, {
                 test_id: this.isList
             }).then(response => {
                 let resultVerifyAnswer = JSON.parse(response.data.message[0].verify_answer)
@@ -283,7 +283,7 @@ export default {
                 this.isList = "SuccessTest"
                 this.isNextR = nextR
 
-                axios.post(`http://${settings.host}:${settings.port}/user/loading`, {
+                axios.post(`http://${settings.host}/user/loading`, {
                     name: localStorage.getItem("name"),
                     number: nextR
                 }).then(response => {
@@ -292,7 +292,7 @@ export default {
 
                 console.log(nextR)
             } else {
-                axios.post(`http://${settings.host}:${settings.port}/user/loading`, {
+                axios.post(`http://${settings.host}/user/loading`, {
                     name: localStorage.getItem("name"),
                     number: nextR
                 }).then(response => {

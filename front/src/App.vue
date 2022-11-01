@@ -47,12 +47,12 @@ export default {
           try {
               await axios({
                   method: 'post',
-                  url: `http://${settings.host}:${settings.port}/user/loginByToken`,
+                  url: `http://${settings.host}/user/loginByToken`,
                   headers: {'Authorization': token}
               })
               const infoUser = await axios({
                   method: 'get',
-                  url: `http://${settings.host}:${settings.port}/user/infoByToken`,
+                  url: `http://${settings.host}/user/infoByToken`,
                   headers: {'Authorization': token}
               })
               localStorage.setItem("name", infoUser.data.user.name)

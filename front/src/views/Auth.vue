@@ -37,7 +37,7 @@ export default {
     methods: {
         async submitAuth() {
             try {
-                const result = await axios.post(`http://${settings.host}:${settings.port}/user/login`, {
+                const result = await axios.post(`http://${settings.host}/user/login`, {
                     mail: this.email,
                     password: this.password
                 })
@@ -54,7 +54,7 @@ export default {
                 try {
                     axios({
                         method: 'post',
-                        url: `http://${settings.host}:${settings.port}/user/loginByToken`,
+                        url: `http://${settings.host}/user/loginByToken`,
                         headers: {'Authorization': token}
                     })
                     this.$router.push({path: "/profile"})

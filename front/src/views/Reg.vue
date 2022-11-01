@@ -44,7 +44,7 @@ export default {
 
     methods: {
         submitPost() {
-            axios.post(`http://${settings.host}:${settings.port}/user/register/`, {                
+            axios.post(`http://${settings.host}/user/register/`, {                
                 name: this.fio,
                 number: this.phone,
                 mail: this.email,
@@ -68,7 +68,7 @@ export default {
                 try {
                     axios({
                         method: 'post',
-                        url: `http://${settings.host}:${settings.port}/user/loginByToken`,
+                        url: `http://${settings.host}/user/loginByToken`,
                         headers: {'Authorization': token}
                     })
                     this.$router.push({path: "/profile"})
